@@ -1,0 +1,50 @@
+---
+version: '3.7'
+
+services:
+  vote:
+    container_name: vote
+    image: dockersamples/examplevotingapp_vote
+    networks:
+      - frontend
+    ports:
+      - 5000:80
+    depends_on:
+      - redis
+  result:
+    container_name: result
+    image: dockersamples/examplevotingapp_result
+    networks:
+      - backend
+    ports:
+      - 5001:80
+    depends_on:
+      - db
+  backend:
+    container_name: backend
+    image: dockersamples/examplevotingapp_worker
+    networks:
+      - frontend 
+      - backend
+
+  redis:
+    container_name: redis
+    image: redis:alpine
+    networks:
+      - frontend
+  db: 
+    container_name: db
+    image: postgres:9.4
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
+volumes:
+  db-data: 
